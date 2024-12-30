@@ -14,6 +14,7 @@ import 'package:rxdart/rxdart.dart';
 import 'DioErrorHandler.dart';
 
 class GooglePlaceAutoCompleteTextField extends StatefulWidget {
+  GooglePlaceAutoCompleteTextFieldState? stateController;
   InputDecoration inputDecoration;
   ItemClick? itemClick;
   GetPlaceDetailswWithLatLng? getPlaceDetailWithLatLng;
@@ -39,6 +40,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
       required this.googleAPIKey,
+        this.stateController,
       this.debounceTime: 600,
       this.inputDecoration: const InputDecoration(),
       this.itemClick,
@@ -57,11 +59,11 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.placeType,this.language='en'});
 
   @override
-  _GooglePlaceAutoCompleteTextFieldState createState() =>
-      _GooglePlaceAutoCompleteTextFieldState();
+  GooglePlaceAutoCompleteTextFieldState createState() =>
+      GooglePlaceAutoCompleteTextFieldState();
 }
 
-class _GooglePlaceAutoCompleteTextFieldState
+class GooglePlaceAutoCompleteTextFieldState
     extends State<GooglePlaceAutoCompleteTextField> {
   final subject = new PublishSubject<String>();
   OverlayEntry? _overlayEntry;
@@ -191,11 +193,18 @@ class _GooglePlaceAutoCompleteTextFieldState
   @override
   void initState() {
     super.initState();
+    sutUpStateController();
     _dio = Dio();
     subject.stream
         .distinct()
         .debounceTime(Duration(milliseconds: widget.debounceTime))
         .listen(textChanged);
+  }
+
+  void sutUpStateController() {
+    if(widget.stateController!=null){
+      widget.stateController = this;
+    }
   }
 
   textChanged(String text) async {
