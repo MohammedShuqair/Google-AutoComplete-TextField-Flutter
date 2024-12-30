@@ -103,10 +103,14 @@ class GooglePlaceAutoCompleteTextFieldState
                 controller: widget.textEditingController,
                 focusNode: widget.focusNode ?? FocusNode(),
                 onChanged: (string) {
-                  subject.add(string);
-                  if (widget.isCrossBtnShown) {
-                    isCrossBtn = string.isNotEmpty ? true : false;
-                    setState(() {});
+                  if(string.trim().isEmpty){
+                    clearData();
+                  }else {
+                    subject.add(string);
+                    if (widget.isCrossBtnShown) {
+                      isCrossBtn = string.isNotEmpty ? true : false;
+                      setState(() {});
+                    }
                   }
                 },
               ),
