@@ -36,6 +36,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   FocusNode? focusNode;
   PlaceType? placeType;
   String? language;
+  Widget? suffixButton;
 
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
@@ -56,7 +57,9 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.containerHorizontalPadding,
       this.containerVerticalPadding,
       this.focusNode,
-      this.placeType,this.language='en'});
+      this.placeType,this.language='en',
+      this.suffixButton,
+      });
 
   @override
   GooglePlaceAutoCompleteTextFieldState createState() =>
@@ -118,7 +121,12 @@ class GooglePlaceAutoCompleteTextFieldState
             (!widget.isCrossBtnShown)
                 ? SizedBox()
                 : isCrossBtn && _showCrossIconWidget()
-                    ? IconButton(onPressed: clearData, icon: Icon(Icons.close))
+                    ?widget.suffixButton!=null?
+                InkWell(
+                  onTap: clearData,
+                  child: widget.suffixButton,
+                )
+                : IconButton(onPressed: clearData, icon: Icon(Icons.close))
                     : SizedBox()
           ],
         ),
