@@ -28,11 +28,8 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   ListItemBuilder? itemBuilder;
   Widget? seperatedBuilder;
   void clearData;
-  BoxDecoration? boxDecoration;
   bool isCrossBtnShown;
   bool showError;
-  double? containerHorizontalPadding;
-  double? containerVerticalPadding;
   FocusNode? focusNode;
   PlaceType? placeType;
   String? language;
@@ -51,12 +48,9 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.countries,
       this.getPlaceDetailWithLatLng,
       this.itemBuilder,
-      this.boxDecoration,
       this.isCrossBtnShown = true,
       this.seperatedBuilder,
       this.showError = true,
-      this.containerHorizontalPadding,
-      this.containerVerticalPadding,
       this.focusNode,
       this.placeType,this.language='en',
       this.suffixButton,
@@ -87,52 +81,34 @@ class GooglePlaceAutoCompleteTextFieldState
   Widget build(BuildContext context) {
     return CompositedTransformTarget(
       link: _layerLink,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-            horizontal: widget.containerHorizontalPadding ?? 0,
-            vertical: widget.containerVerticalPadding ?? 0),
-        alignment: Alignment.centerLeft,
-        decoration: widget.boxDecoration ??
-            BoxDecoration(
-                shape: BoxShape.rectangle,
-                border: Border.all(color: Colors.grey, width: 0.6),
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: widget.inputDecoration,
-                style: widget.textStyle,
-                controller: widget.textEditingController,
-                focusNode: widget.focusNode ?? FocusNode(),
-                validator: widget.validator,
-                onChanged: (string) {
-                  if(string.trim().isEmpty){
-                    clearData();
-                  }else {
-                    subject.add(string);
-                    if (widget.isCrossBtnShown) {
-                      isCrossBtn = string.isNotEmpty ? true : false;
-                      setState(() {});
-                    }
-                  }
-                },
-              ),
-            ),
-            (!widget.isCrossBtnShown)
-                ? SizedBox()
-                : isCrossBtn && _showCrossIconWidget()
-                    ?widget.suffixButton!=null?
-                InkWell(
-                  onTap: clearData,
-                  child: widget.suffixButton,
-                )
-                : IconButton(onPressed: clearData, icon: Icon(Icons.close))
-                    : SizedBox()
-          ],
+      child: TextFormField(
+        decoration: widget.inputDecoration.copyWith(
+          suffixIcon:(!widget.isCrossBtnShown)
+              ? SizedBox()
+              : isCrossBtn && _showCrossIconWidget()
+              ?widget.suffixButton!=null?
+          InkWell(
+            onTap: clearData,
+            child: widget.suffixButton,
+          )
+              : IconButton(onPressed: clearData, icon: Icon(Icons.close))
+              : SizedBox()
         ),
+        style: widget.textStyle,
+        controller: widget.textEditingController,
+        focusNode: widget.focusNode ?? FocusNode(),
+        validator: widget.validator,
+        onChanged: (string) {
+          if(string.trim().isEmpty){
+            clearData();
+          }else {
+            subject.add(string);
+            if (widget.isCrossBtnShown) {
+              isCrossBtn = string.isNotEmpty ? true : false;
+              setState(() {});
+            }
+          }
+        },
       ),
     );
   }
