@@ -37,6 +37,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   PlaceType? placeType;
   String? language;
   Widget? suffixButton;
+  String? Function(String?)? validator;
 
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
@@ -59,6 +60,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.focusNode,
       this.placeType,this.language='en',
       this.suffixButton,
+        this.validator,
       });
 
   @override
@@ -105,6 +107,7 @@ class GooglePlaceAutoCompleteTextFieldState
                 style: widget.textStyle,
                 controller: widget.textEditingController,
                 focusNode: widget.focusNode ?? FocusNode(),
+                validator: widget.validator,
                 onChanged: (string) {
                   if(string.trim().isEmpty){
                     clearData();
