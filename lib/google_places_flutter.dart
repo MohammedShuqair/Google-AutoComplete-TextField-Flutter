@@ -55,7 +55,9 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.placeType,this.language='en',
       this.suffixButton,
         this.validator,
-      });
+      }){
+    focusNode ??= FocusNode();
+  }
 
   @override
   GooglePlaceAutoCompleteTextFieldState createState() =>
@@ -94,9 +96,12 @@ class GooglePlaceAutoCompleteTextFieldState
               : IconButton(onPressed: clearData, icon: Icon(Icons.close))
               : null
         ),
+        onTapOutside: (d){
+          widget.focusNode?.unfocus();
+        },
         style: widget.textStyle,
         controller: widget.textEditingController,
-        focusNode: widget.focusNode ?? FocusNode(),
+        focusNode: widget.focusNode,
         validator: widget.validator,
         onChanged: (string) {
           if(string.trim().isEmpty){
@@ -234,6 +239,7 @@ class GooglePlaceAutoCompleteTextFieldState
                               getPlaceDetailsFromPlaceId(selectedData);
                             }
                             removeOverlay();
+                            widget.focusNode?.unfocus();
                           }
                         },
                         child: widget.itemBuilder != null
@@ -297,6 +303,7 @@ class GooglePlaceAutoCompleteTextFieldState
         this._overlayEntry?.remove();
       } catch (e) {}
     }
+    widget.focusNode?.unfocus();
   }
 
   _showCrossIconWidget() {
