@@ -91,7 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
               TextPosition(offset: prediction.description?.length ?? 0));
         },
         seperatedBuilder: Divider(),
-        containerHorizontalPadding: 10,
 
 
         // OPTIONAL// If you want to customize list view item builder

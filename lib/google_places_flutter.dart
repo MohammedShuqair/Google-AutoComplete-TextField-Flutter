@@ -84,7 +84,7 @@ class GooglePlaceAutoCompleteTextFieldState
       child: TextFormField(
         decoration: widget.inputDecoration.copyWith(
           suffixIcon:(!widget.isCrossBtnShown)
-              ? SizedBox()
+              ? null
               : isCrossBtn && _showCrossIconWidget()
               ?widget.suffixButton!=null?
           InkWell(
@@ -92,7 +92,7 @@ class GooglePlaceAutoCompleteTextFieldState
             child: widget.suffixButton,
           )
               : IconButton(onPressed: clearData, icon: Icon(Icons.close))
-              : SizedBox()
+              : null
         ),
         style: widget.textStyle,
         controller: widget.textEditingController,
