@@ -303,7 +303,6 @@ class GooglePlaceAutoCompleteTextFieldState
         this._overlayEntry?.remove();
       } catch (e) {}
     }
-    widget.focusNode?.unfocus();
   }
 
   _showCrossIconWidget() {
