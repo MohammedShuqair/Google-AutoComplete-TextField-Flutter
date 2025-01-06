@@ -35,6 +35,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   String? language;
   Widget? suffixButton;
   String? Function(String?)? validator;
+  final bool cleanDataWhenUnFocus ;
 
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
@@ -54,7 +55,7 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.focusNode,
       this.placeType,this.language='en',
       this.suffixButton,
-        this.validator,
+        this.validator,  this.cleanDataWhenUnFocus=true,
       }){
     focusNode ??= FocusNode();
   }
@@ -98,6 +99,10 @@ class GooglePlaceAutoCompleteTextFieldState
         ),
         onTapOutside: (d){
           widget.focusNode?.unfocus();
+
+          if (widget.cleanDataWhenUnFocus) {
+            clearData();
+          }
         },
         style: widget.textStyle,
         controller: widget.textEditingController,
