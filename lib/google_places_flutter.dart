@@ -35,6 +35,9 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
   String? language;
   Widget? suffixButton;
   String? Function(String?)? validator;
+  final bool useOverlay;
+  final EdgeInsetsGeometry listPadding;
+  final ScrollPhysics? physics;
 
   GooglePlaceAutoCompleteTextField(
       {required this.textEditingController,
@@ -55,6 +58,8 @@ class GooglePlaceAutoCompleteTextField extends StatefulWidget {
       this.placeType,this.language='en',
       this.suffixButton,
         this.validator,
+        this.useOverlay=true,
+        this.listPadding= EdgeInsets.zero, this.physics,
       }){
     focusNode ??= FocusNode();
   }
@@ -81,9 +86,8 @@ class GooglePlaceAutoCompleteTextFieldState
 
   @override
   Widget build(BuildContext context) {
-    return CompositedTransformTarget(
-      link: _layerLink,
-      child: TextFormField(
+
+    var textFormField = TextFormField(
         decoration: widget.inputDecoration.copyWith(
           suffixIcon:(!widget.isCrossBtnShown)
               ? null
@@ -114,8 +118,21 @@ class GooglePlaceAutoCompleteTextFieldState
             }
           }
         },
-      ),
-    );
+      );
+    if(widget.useOverlay) {
+      return CompositedTransformTarget(
+        link: _layerLink,
+        child: textFormField,
+      );
+    } else{
+      return Column(
+        children: [
+          textFormField,
+          buildListView(),
+        ],
+      );
+    }
+
   }
 
   getLocation(String text) async {
@@ -166,7 +183,7 @@ class GooglePlaceAutoCompleteTextFieldState
 
       if (text.length == 0) {
         alPredictions.clear();
-        this._overlayEntry!.remove();
+        this._overlayEntry?.remove();
         return;
       }
 
@@ -175,11 +192,16 @@ class GooglePlaceAutoCompleteTextFieldState
       if (subscriptionResponse.predictions!.length > 0 &&
           (widget.textEditingController.text.toString().trim()).isNotEmpty) {
         alPredictions.addAll(subscriptionResponse.predictions!);
+        setState(() {
+
+        });
       }
 
-      this._overlayEntry = null;
-      this._overlayEntry = this._createOverlayEntry();
-      Overlay.of(context)!.insert(this._overlayEntry!);
+      if (widget.useOverlay) {
+        this._overlayEntry = null;
+        this._overlayEntry = this._createOverlayEntry();
+        Overlay.of(context)!.insert(this._overlayEntry!);
+      }
     } catch (e) {
       var errorHandler = ErrorHandler.internal().handleError(e);
       _showSnackBar("${errorHandler.message}");
@@ -222,38 +244,48 @@ class GooglePlaceAutoCompleteTextFieldState
                   link: this._layerLink,
                   offset: Offset(0.0, size.height + 5.0),
                   child: Material(
-                      child: ListView.separated(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: alPredictions.length,
-                    separatorBuilder: (context, pos) =>
-                        widget.seperatedBuilder ?? SizedBox(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return InkWell(
-                        onTap: () {
-                          var selectedData = alPredictions[index];
-                          if (index < alPredictions.length) {
-                            widget.itemClick!(selectedData);
-
-                            if (widget.isLatLngRequired) {
-                              getPlaceDetailsFromPlaceId(selectedData);
-                            }
-                            removeOverlay();
-                            widget.focusNode?.unfocus();
-                          }
-                        },
-                        child: widget.itemBuilder != null
-                            ? widget.itemBuilder!(
-                                context, index, alPredictions[index])
-                            : Container(
-                                padding: EdgeInsets.all(10),
-                                child: Text(alPredictions[index].description!)),
-                      );
-                    },
-                  )),
+                      child: buildListView(),),
                 ),
               ));
     }
+  }
+
+  ListView buildListView() {
+    return ListView.separated(
+                  padding: widget.listPadding,
+                  shrinkWrap: true,
+                  physics: widget.physics,
+                  itemCount: alPredictions.length,
+                  separatorBuilder: (context, pos) =>
+                      widget.seperatedBuilder ?? SizedBox(),
+                  itemBuilder: (BuildContext context, int index) {
+                    return InkWell(
+                      onTap: () {
+                        var selectedData = alPredictions[index];
+                        if (index < alPredictions.length) {
+                          widget.itemClick!(selectedData);
+
+                          if (widget.isLatLngRequired) {
+                            getPlaceDetailsFromPlaceId(selectedData);
+                          }
+                          if (widget.useOverlay) {
+                            removeOverlay();
+                          }else{
+                            alPredictions.clear();
+                            setState(() {});
+                          }
+                          widget.focusNode?.unfocus();
+                        }
+                      },
+                      child: widget.itemBuilder != null
+                          ? widget.itemBuilder!(
+                              context, index, alPredictions[index])
+                          : Container(
+                              padding: EdgeInsets.all(10),
+                              child: Text(alPredictions[index].description!)),
+                    );
+                  },
+                );
   }
 
   removeOverlay() {
